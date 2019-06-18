@@ -37,6 +37,8 @@ const options = {
     { to: '/', label: 'Home' },
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/contact', label: 'Contact' },
+    { to: '/about', label: 'About' },
+    { to: '/blog', label: 'Blog' },
   ],
 }
 
@@ -44,12 +46,14 @@ ReactDOM.render(
   <>
     <Breadcrumb icons={options.icons} separator='/'>
       {options.items.map(({ to, label }) => {
-        const Icon = toStyledIcon(options.icons[label])
+        let StyledIcon
+        const Icon = options.icons[label]
+        if (Icon) StyledIcon = toStyledIcon(options.icons[label])
         return (
-          <>
-            {Icon && <Icon />}
+          <div key={to}>
+            {Icon && <StyledIcon />}
             <StyledLink to={to}>{label}</StyledLink>
-          </>
+          </div>
         )
       })}
     </Breadcrumb>

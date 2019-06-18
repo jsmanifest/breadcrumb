@@ -7,7 +7,9 @@ const StyledCollapsedRoot = styled.li`
 `
 
 const StyledMoreIcon = styled(MdMoreHoriz)`
-  color: red;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  color: #000;
   margin-left: 5px;
   margin-right: 5px;
   border-radius: 2px;
@@ -15,10 +17,11 @@ const StyledMoreIcon = styled(MdMoreHoriz)`
   height: 25px;
   &:hover,
   &:focus {
-    background-color: salmon;
+    color: #999;
+    transform: scale(1.15);
   }
   &:active {
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    color: #333;
   }
 `
 

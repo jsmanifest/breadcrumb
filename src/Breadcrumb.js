@@ -9,13 +9,13 @@ const StyledRoot = styled.ol`
   list-style: none;
 `
 
-const toStyledSeparator = (separator) => {
+const toStyledSeparator = (separator, index) => {
   const StyledSeparator = styled.span`
     color: #333;
     margin: auto 6px;
     user-select: none;
   `
-  return <StyledSeparator>{separator}</StyledSeparator>
+  return <StyledSeparator key={`sep${index}`}>{separator}</StyledSeparator>
 }
 
 const toStyledItem = (child, index) => {
@@ -23,6 +23,10 @@ const toStyledItem = (child, index) => {
     padding: 1px;
     display: flex;
     align-items: center;
+    > div:first-child {
+      display: flex;
+      align-items: center;
+    }
   `
   return (
     <StyledBreadcrumbItem key={`breadcrumbItem${index}`}>
@@ -33,8 +37,11 @@ const toStyledItem = (child, index) => {
 
 const toReducedItems = (lastIndex, separator) => (acc, currChild, index) => {
   const notLast = index < lastIndex
-  if (notLast) acc.push(currChild, separator)
-  else acc.push(currChild)
+  if (notLast) {
+    acc.push(currChild, toStyledSeparator(separator, index))
+  } else {
+    acc.push(currChild)
+  }
   return acc
 }
 
@@ -51,12 +58,16 @@ const Breadcrumb = ({ children, collapse = {}, separator }) => {
   items = items
     .filter(React.isValidElement)
     .map(toStyledItem)
-    .reduce(toReducedItems(lastIndex, toStyledSeparator(separator)), [])
+    .reduce(toReducedItems(lastIndex, separator), [])
 
-  if (!expanded || totalItems > max) {
+  if (!expanded || totalItems <= max) {
     items = [
       ...items.slice(0, itemsBefore),
-      <CollapsedSeparator onClick={open} />,
+      <CollapsedSeparator
+        title='Expand'
+        key='collapsed-seperator'
+        onClick={open}
+      />,
       ...items.slice(totalItems - itemsAfter, totalItems),
     ]
   }
