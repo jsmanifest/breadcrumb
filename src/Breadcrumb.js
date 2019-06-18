@@ -1,78 +1,37 @@
 import React from 'react'
-import styled from 'styled-components'
-import useBreadCrumb from './useBreadCrumb'
-import CollapsedSeparator from './CollapsedSeparator'
 
-const StyledRoot = styled.ol`
-  display: flex;
-  align-items: center;
-  list-style: none;
-`
+const BreadcrumbItem = ({ children, ...props }) => (
+  <li className='breadcrumb-item' {...props}>
+    {children}
+  </li>
+)
 
-const toStyledSeparator = (separator, index) => {
-  const StyledSeparator = styled.span`
-    color: #333;
-    margin: auto 6px;
-    user-select: none;
-  `
-  return <StyledSeparator key={`sep${index}`}>{separator}</StyledSeparator>
-}
+const BreadcrumbSeparator = ({ children, ...props }) => (
+  <li className='breadcrumb-separator' {...props}>
+    {children}
+  </li>
+)
 
-const toStyledItem = (child, index) => {
-  const StyledBreadcrumbItem = styled.li`
-    padding: 1px;
-    display: flex;
-    align-items: center;
-    > div:first-child {
-      display: flex;
-      align-items: center;
+const Breadcrumb = ({ separator, ...props }) => {
+  let children = React.Children.toArray(props.children)
+
+  children = children.map((child, index) => (
+    <BreadcrumbItem key={`breadcrumb_item${index}`}>{child}</BreadcrumbItem>
+  ))
+
+  const lastIndex = children.length - 1
+
+  children = children.reduce((acc, child, index) => {
+    const notLast = index < lastIndex
+    if (notLast) {
+      acc.push(child, <BreadcrumbSeparator>{separator}</BreadcrumbSeparator>)
+    } else {
+      acc.push(child)
     }
-  `
-  return (
-    <StyledBreadcrumbItem key={`breadcrumbItem${index}`}>
-      {child}
-    </StyledBreadcrumbItem>
-  )
-}
+    return acc
+  }, [])
 
-const toReducedItems = (lastIndex, separator) => (acc, currChild, index) => {
-  const notLast = index < lastIndex
-  if (notLast) {
-    acc.push(currChild, toStyledSeparator(separator, index))
-  } else {
-    acc.push(currChild)
-  }
-  return acc
-}
-
-const Breadcrumb = ({ children, collapse = {}, separator }) => {
-  let items = React.Children.toArray(children)
-
-  const { expanded, open } = useBreadCrumb()
-
-  const { itemsBefore = 1, itemsAfter = 1, max = 4 } = collapse
-
-  const totalItems = items.length
-  const lastIndex = totalItems - 1
-
-  items = items
-    .filter(React.isValidElement)
-    .map(toStyledItem)
-    .reduce(toReducedItems(lastIndex, separator), [])
-
-  if (!expanded || totalItems <= max) {
-    items = [
-      ...items.slice(0, itemsBefore),
-      <CollapsedSeparator
-        title='Expand'
-        key='collapsed-seperator'
-        onClick={open}
-      />,
-      ...items.slice(totalItems - itemsAfter, totalItems),
-    ]
-  }
-
-  return <StyledRoot>{items}</StyledRoot>
+  return <ol>{children}</ol>
 }
 
 export default Breadcrumb
